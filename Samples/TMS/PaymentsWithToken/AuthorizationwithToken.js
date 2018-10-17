@@ -13,7 +13,7 @@ function processAuthorizationWithToken() {
         var instance = new CybersourceRestApi.PaymentApi(apiClient);
 
         var clientReferenceInformation = new CybersourceRestApi.V2paymentsClientReferenceInformation();
-        clientReferenceInformation.code = "TC50171_3";
+        clientReferenceInformation.code =  "test_payment";
 
         var processingInformation = new CybersourceRestApi.V2paymentsProcessingInformation();
         processingInformation.commerceIndicator = "internet";
@@ -21,10 +21,10 @@ function processAuthorizationWithToken() {
         var subMerchant = new CybersourceRestApi.V2paymentsAggregatorInformationSubMerchant();
         subMerchant.cardAcceptorId = "1234567890";
         subMerchant.country = "US";
-        subMerchant.phoneNumber = "650-432-0000";
-        subMerchant.address1 = "900 Metro Center";
-        subMerchant.postalCode = "94404-2775";
-        subMerchant.locality = "Foster City";
+        subMerchant.phoneNumber = "4158880000";
+        subMerchant.address1 = "1 Market St";
+        subMerchant.postalCode = "94105";
+        subMerchant.locality = "San Francisco";
         subMerchant.name = "Visa Inc";
         subMerchant.administrativeArea = "CA";
         subMerchant.region = "PEN";
@@ -40,8 +40,8 @@ function processAuthorizationWithToken() {
         billTo.lastName = "Deo";
         billTo.address2 = "Address 2";
         billTo.address1 = "201 S. Division St.";
-        billTo.postalCode = "48104-2201";
-        billTo.locality = "Ann Arbor";
+        billTo.postalCode = "94105";
+        billTo.locality = "San Francisco";
         billTo.administrativeArea = "MI";
         billTo.firstName = "John";
         billTo.phoneNumber = "999999999";

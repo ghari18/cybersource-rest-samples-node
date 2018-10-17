@@ -23,7 +23,7 @@ function createInstrumentIdentifier() {
         billTo.company = "CyberSource";
         billTo.address1 = "12 Main Street";
         billTo.address2 = "20 My Street";
-        billTo.locality = "Foster City";
+        billTo.locality = "San Francisco";
         billTo.administrativeArea = "CA";
         billTo.postalCode = "90200";
         billTo.country = "US";
