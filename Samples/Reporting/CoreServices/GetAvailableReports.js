@@ -1,32 +1,41 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
 
 /**
  * This is a sample code to call ReportsApi,
- * retrive  report subscription
+ * retrive  available reports.
  */
 function RetrieveAvailableReports(callback) {
+    try {
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.ReportsApi(configObject);
 
-    var apiClient = new CybersourceRestApi.ApiClient();
-    var instance = new CybersourceRestApi.ReportsApi(apiClient);
-    
-    var request = "";
+        var startTime = new Date("2018-10-01T00:00:00.0Z").toISOString();
+        var endTime = new Date("2018-10-30T23:59:59.0Z").toISOString();
+        var timeQueryType = "executedTime";
+        var opts = [];
+        opts['organizationId'] = "testrest";
 
-    instance.getReportByReportId(request, function (error, data, response) {
-        if (error) {
-            console.log("Error : " + error);
-            console.log("Error : " + error.stack);
-            console.log("Error status code : " + error.statusCode);
-        }
-        else if (data) {
-            console.log("Data : " + JSON.stringify(data));
-        }
-        console.log("Response : " + JSON.stringify(response));
-        console.log("Response id : " + response[text.id]);
+        console.log("****************Get Available Reports****************")
 
-    });
-
+        instance.searchReports(startTime, endTime, timeQueryType, opts, function (error, data, response) {
+            if (error) {
+                console.log("\nError in get available reports : " + error);
+            }
+            else if (data) {
+                console.log("\nData of get available reports : " + JSON.stringify(data));
+            }
+            console.log("\nResponse of get available reports : " + JSON.stringify(response));
+            console.log("\nResponse Code of get available reports : " + JSON.stringify(response['status']));
+            callback(error, data);
+        });
+    } catch (error) {
+        console.log(error);
+    }
 };
 if (require.main === module) {
     RetrieveAvailableReports(function () {

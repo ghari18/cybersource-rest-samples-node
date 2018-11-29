@@ -1,36 +1,46 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
-
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
+var RefundPayment = require('./RefundPayment');
 /**
  * This is a sample code to call VoidApi,
  * Void a Refund
  * Include the refund ID in the POST request to cancel the refund.
  */
-function voidARefund() {
+function voidARefund(callback) {
 
     try {
-        var apiClient = new CybersourceRestApi.ApiClient();
-        var instance = new CybersourceRestApi.VoidApi(apiClient);
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.VoidApi(configObject);
 
-        var clientReferenceInformation = new CybersourceRestApi.V2paymentsClientReferenceInformation();
-        clientReferenceInformation.code = "test_void";
+        var clientReferenceInformation = new CybersourceRestApi.Ptsv2paymentsClientReferenceInformation();
+        clientReferenceInformation.code = "test_refund_void";
 
         var request = new CybersourceRestApi.VoidRefundRequest();
         request.clientReferenceInformation = clientReferenceInformation;
 
-        var id = "5336232827876732903529";
-        instance.voidRefund(request, id, function (error, data, response) {
-            if (error) {
-                console.log("Error : " + error);
-                console.log("Error : " + error.stack);
-                console.log("Error status code : " + error.statusCode);
-            }
-            else if (data) {
-                console.log("Data : " + JSON.stringify(data));
-            }
-            console.log("Response : " + JSON.stringify(response));
+        RefundPayment.refundAPayment(function (error, data) {
+            if (data) {
+                var id = data['id'];
+                console.log("\n*************** Void Refund ********************* ");
+                console.log("Refund ID passing to voidRefund : " + id);
 
+                instance.voidRefund(request, id, function (error, data, response) {
+                    if (error) {
+                        console.log("\nError in void refund: " + error);
+                    }
+                    else if (data) {
+                        console.log("\nData of void refund : " + JSON.stringify(data));
+                    }
+                    console.log("\nResponse of  void refund  : " + JSON.stringify(response));
+                    console.log("\nResponse Code of void refund : " + JSON.stringify(response['status']));
+                    callback(error, data);
+                });
+
+            }
         });
     } catch (error) {
         console.log(error);
@@ -38,7 +48,7 @@ function voidARefund() {
 };
 if (require.main === module) {
     voidARefund(function () {
-        console.log('Method call complete.');
+        console.log('Void Refund end.');
     });
 }
 module.exports.voidARefund = voidARefund;

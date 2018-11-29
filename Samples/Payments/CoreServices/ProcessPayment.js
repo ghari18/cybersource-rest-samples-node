@@ -1,51 +1,54 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
 
 /**
  * This is a sample code to call PaymentApi,
  * createPayment method will create a new payment
  */
-function processAPayment() {
+function processPayment(callback, enableCapture) {
     try {
-        var apiClient = new CybersourceRestApi.ApiClient();
-        var instance = new CybersourceRestApi.PaymentApi(apiClient);
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.PaymentsApi(configObject);
 
-        var clientReferenceInformation = new CybersourceRestApi.V2paymentsClientReferenceInformation();
-        clientReferenceInformation.code = "TC50171_3";
+        var clientReferenceInformation = new CybersourceRestApi.Ptsv2paymentsClientReferenceInformation();
+        clientReferenceInformation.code = "test_payment";
 
-        var processingInformation = new CybersourceRestApi.V2paymentsProcessingInformation();
+        var processingInformation = new CybersourceRestApi.Ptsv2paymentsProcessingInformation();
         processingInformation.commerceIndicator = "internet";
 
-        var subMerchant = new CybersourceRestApi.V2paymentsAggregatorInformationSubMerchant();
+        var subMerchant = new CybersourceRestApi.Ptsv2paymentsAggregatorInformationSubMerchant();
         subMerchant.cardAcceptorId = "1234567890";
         subMerchant.country = "US";
-        subMerchant.phoneNumber = "650-432-0000";
-        subMerchant.address1 = "900 Metro Center";
-        subMerchant.postalCode = "94404-2775";
-        subMerchant.locality = "Foster City";
+        subMerchant.phoneNumber = "4158880000";
+        subMerchant.address1 = "1 Market St";
+        subMerchant.postalCode = "94105";
+        subMerchant.locality = "San Francisco";
         subMerchant.name = "Visa Inc";
         subMerchant.administrativeArea = "CA";
         subMerchant.region = "PEN";
         subMerchant.email = "test@cybs.com";
 
-        var aggregatorInformation = new CybersourceRestApi.V2paymentsAggregatorInformation();
+        var aggregatorInformation = new CybersourceRestApi.Ptsv2paymentsAggregatorInformation();
         aggregatorInformation.subMerchant = subMerchant;
         aggregatorInformation.name = "V-Internatio";
         aggregatorInformation.aggregatorId = "123456789";
 
-        var amountDetails = new CybersourceRestApi.V2paymentsOrderInformationAmountDetails();
+        var amountDetails = new CybersourceRestApi.Ptsv2paymentsOrderInformationAmountDetails();
         amountDetails.totalAmount = "102.21";
         amountDetails.currency = "USD";
 
-        var billTo = new CybersourceRestApi.V2paymentsOrderInformationBillTo();
+        var billTo = new CybersourceRestApi.Ptsv2paymentsOrderInformationBillTo();
         billTo.country = "US";
-        billTo.firstName = "Test";
-        billTo.lastName = "test";
-        billTo.phoneNumber = "9999999999";
+        billTo.firstName = "John";
+        billTo.lastName = "Deo";
+        billTo.phoneNumber = "4158880000";
         billTo.address1 = "test";
-        billTo.postalCode = "48104-2201";
-        billTo.locality = "Ann Arbor";
+        billTo.postalCode = "94105";
+        billTo.locality = "San Francisco";
         billTo.administrativeArea = "MI";
         billTo.email = "test@cybs.com";
         billTo.address2 = "Address 2";
@@ -53,12 +56,12 @@ function processAPayment() {
         billTo.buildingNumber = "123";
         billTo.company = "Visa";
 
-        var orderInformation = new CybersourceRestApi.V2paymentsOrderInformation();
+        var orderInformation = new CybersourceRestApi.Ptsv2paymentsOrderInformation();
         orderInformation.amountDetails = amountDetails;
         orderInformation.billTo = billTo;
 
-        var paymentInformation = new CybersourceRestApi.V2paymentsPaymentInformation();
-        var card = new CybersourceRestApi.V2paymentsPaymentInformationCard();
+        var paymentInformation = new CybersourceRestApi.Ptsv2paymentsPaymentInformation();
+        var card = new CybersourceRestApi.Ptsv2paymentsPaymentInformationCard();
         card.expirationYear = "2031";
         card.number = "4111111111111111";
         card.expirationMonth = "03";
@@ -73,25 +76,29 @@ function processAPayment() {
         request.orderInformation = orderInformation;
         request.paymentInformation = paymentInformation;
 
+        if (enableCapture === true) {
+            request.processingInformation.capture = true;
+        }
+        console.log("\n*************** Process Payment ********************* ");
+
         instance.createPayment(request, function (error, data, response) {
             if (error) {
-                console.log("Error : " + error);
-                console.log("Error : " + error.stack);
-                console.log("Error status code : " + error.statusCode);
+                console.log("\nError in process a payment : " + error);
             }
             else if (data) {
-                console.log("Data : " + JSON.stringify(data));
+                console.log("\nData of process a payment : " + JSON.stringify(data));
             }
-            console.log("Response : " + JSON.stringify(response));
-
+            console.log("\nResponse of process a payment : " + JSON.stringify(response));
+            console.log("\nResponse Code of process a payment : " + JSON.stringify(response['status']));
+            callback(error, data);
         });
     } catch (error) {
         console.log(error);
     }
 };
 if (require.main === module) {
-    processAPayment(function () {
-        console.log('Method call complete.');
-    });
+    processPayment(function () {
+        console.log('ProcessPayment end.');
+    }, false);
 }
-module.exports.processAPayment = processAPayment;
+module.exports.processPayment = processPayment;

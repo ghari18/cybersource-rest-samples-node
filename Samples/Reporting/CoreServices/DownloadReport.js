@@ -1,34 +1,42 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
 
 /**
  * This is a sample code to call ReportDownloadsApi,
  * download  report 
  */
-function downloadReport() {
+function downloadReport(callback) {
+    try {
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.ReportDownloadsApi(configObject);
 
-    var apiClient = new CybersourceRestApi.ApiClient();
-    var instance = new CybersourceRestApi.ReportDownloadsApi(apiClient);
+        var reportDate = "2018-09-02";
+        var reportName = "testrest_v2";
 
-    var request = "";
+        var opts = [];
 
-    instance.downloadReport(request, function (error, data, response) {
-        if (error) {
-            console.log("Error : " + error);
-        }
-        else if (data) {
-            console.log("Data : " + JSON.stringify(data));
-        }
-        console.log("Response : " + JSON.stringify(response));
-        console.log("Response id : " + response[text.id]);
+        opts['organizationId'] = "testrest";
 
-    });
+        console.log("****************Download Report****************");
 
+        instance.downloadReport(reportDate, reportName, opts, function (error, data, response) {
+            if (error) {
+                console.log("\nError in Download report : " + error);
+            }
+            callback(error, data);
+        });
+        console.log(reportName + '.xml downloaded successfully')
+    } catch (error) {
+        console.log(error);
+    }
 };
 if (require.main === module) {
     downloadReport(function () {
-        console.log('Method call complete.');
+        console.log('Download report end.');
     });
 }
 module.exports.downloadReport = downloadReport;

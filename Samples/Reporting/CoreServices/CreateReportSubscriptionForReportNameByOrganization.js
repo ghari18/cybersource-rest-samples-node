@@ -1,54 +1,62 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
-
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
+var DeleteSubscription = require('./DeleteSubscriptionOfReportNameByOrganization');
 /**
  * This is a sample code to call ReportSubscriptionsApi,
  * retrive transaction by username
  */
-function CreateSubscriptionReport() {
+function CreateSubscriptionReport(callback) {
+    try {
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.ReportSubscriptionsApi(configObject);
 
-    var apiClient = new CybersourceRestApi.ApiClient();
-    var instance = new CybersourceRestApi.ReportSubscriptionsApi(apiClient);
-    
-    var request = new CybersourceRestApi.RequestBody()
-    request.report_definition_name = "TransactionRequestClass"
-    request.report_fields = [
-        "Request.RequestID",
-        "Request.TransactionDate",
-        "Request.MerchantID"
-    ]
-    request.report_mime_type = "application/xml"
-    request.report_frequency = "DAILY"
-    request.timezone = "America/Chicago"
-    request.start_time = "0900"
-    request.start_day = 1
-    request.report_filters = {}
-    request.report_preferences = ""
-    request.selected_merchant_group_name = None
-    request.organization_id = "uday_wf"
-    // This variable is not there in request body
-    request.selected_organization_id = None
+        var request = new CybersourceRestApi.RequestBody()
 
+        request.reportDefinitionName = "TransactionRequestClass";
+        request.reportFields = [
+            "Request.RequestID",
+            "Request.TransactionDate",
+            "Request.MerchantID"
+        ];
+        request.reportMimeType = "application/xml";
+        request.reportFrequency = "MONTHLY";
+        request.timezone = "GMT";
+        request.startTime = "0900";
+        request.startDay = 4;
+        request.reportName = "test_v681"
 
-    instance.createSubscription(request, function (error, data, response) {
-        if (error) {
-            console.log("Error : " + error);
-            console.log("Error : " + error.stack);
-            console.log("Error status code : " + error.statusCode);
-        }
-        else if (data) {
-            console.log("Data : " + JSON.stringify(data));
-        }
-        console.log("Response : " + JSON.stringify(response));
-        console.log("Response id : " + response[text.id]);
+        console.log("****************Create Report Subscrption****************")
 
-    });
-
+        instance.createSubscription(request, function (error, data, response) {
+            if (error) {
+                console.log("\nError in create report subscription : " + error);
+            }
+            else if (data) {
+                console.log("\nData of create report subscription : " + JSON.stringify(data));
+            }
+            console.log("\nResponse of create report subscription : " + JSON.stringify(response));
+            var status = JSON.stringify(response['status']);
+            console.log("\nResponse Code of create report subscription : " + status);
+            if (status === "201") {
+                DeleteSubscription.deleteSubscriptionReport(request.reportName, function (error, data) {
+                    if (!error) {
+                        console.log("Deleted the report subscription to clear the bad values in backend")
+                    }
+                });
+            }
+            callback(error, request.reportName);
+        });
+    } catch (error) {
+        console.log(error);
+    }
 };
 if (require.main === module) {
     CreateSubscriptionReport(function () {
-        console.log('Method call complete.');
+        console.log('Create report subscription end.');
     });
 }
 module.exports.CreateSubscriptionReport = CreateSubscriptionReport;

@@ -1,23 +1,26 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
 
 /**
  * This is a sample code to call TMS PaymentInstrumentApi,
  * paymentinstrumentsPost method will create a new PaymentInstruments
  */
 
-function createInstrumentIdentifier() {
+function createPaymentInstrument(callback) {
     try {
-        var apiClient = new CybersourceRestApi.ApiClient();
-        var instance = new CybersourceRestApi.PaymentInstrumentApi(apiClient);
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.PaymentInstrumentsApi(configObject);
 
-        var card = new CybersourceRestApi.PaymentinstrumentsCard();
+        var card = new CybersourceRestApi.Tmsv1paymentinstrumentsCard();
         card.expirationMonth = "09";
         card.expirationYear = "2022";
         card.type = "visa";
 
-        var billTo = new CybersourceRestApi.PaymentinstrumentsBillTo();
+        var billTo = new CybersourceRestApi.Tmsv1paymentinstrumentsBillTo();
         billTo.firstName = "John";
         billTo.lastName = "Deo";
         billTo.company = "CyberSource";
@@ -30,10 +33,10 @@ function createInstrumentIdentifier() {
         billTo.email = "john.smith@example.com";
         billTo.phoneNumber = "555123456";
 
-        var instrumentIdentifierCard = new CybersourceRestApi.InstrumentidentifiersCard()
+        var instrumentIdentifierCard = new CybersourceRestApi.Tmsv1instrumentidentifiersCard()
         instrumentIdentifierCard.number = "4111111111111111";
 
-        var instrumentIdentifier = new CybersourceRestApi.PaymentinstrumentsInstrumentIdentifier();
+        var instrumentIdentifier = new CybersourceRestApi.Tmsv1paymentinstrumentsInstrumentIdentifier();
         instrumentIdentifier.card = instrumentIdentifierCard;
 
         var body = new CybersourceRestApi.Body();
@@ -43,24 +46,28 @@ function createInstrumentIdentifier() {
 
         var profileId = "93B32398-AD51-4CC2-A682-EA3E93614EB1";
 
-        instance.paymentinstrumentsPost(profileId, body, function (error, data, response) {
+        console.log("\n*************** Create PaymentInstrument ********************* ");
+
+        instance.tmsV1PaymentinstrumentsPost(profileId, body, function (error, data, response) {
             if (error) {
-                console.log("Error : " + error.stack);
-                console.log("Error status code : " + error.statusCode);
+                console.log("\nError in create PaymentInstrument : " + error);
             }
             else if (data) {
-                console.log("Data : " + JSON.stringify(data));
+                console.log("\nData of Create PaymentInstrument : " + JSON.stringify(data));
             }
-            console.log("Response : " + JSON.stringify(response));
-            console.log("Response id : " + response[text.id]);
-
+            console.log("\nResponse of  Create PaymentInstrument : " + JSON.stringify(response));
+            console.log("\nResponse Code of Create PaymentInstrument :" + JSON.stringify(response['status']));
+            callback(error, data);
         });
+
     } catch (error) {
         console.log(error);
     }
 };
 
 if (require.main === module) {
-    createInstrumentIdentifier();
+    createPaymentInstrument(function () {
+        console.log('Create PaymentInstrument end.');
+    });
 }
-module.exports.createInstrumentIdentifier = createInstrumentIdentifier;
+module.exports.createPaymentInstrument = createPaymentInstrument;

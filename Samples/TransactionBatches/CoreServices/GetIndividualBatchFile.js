@@ -1,6 +1,9 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
 
 /**
  * This is a sample code to call TransactionBatchApi,
@@ -8,11 +11,13 @@ var CybersourceRestApi = require('CyberSource');
  */
 function getIndividualBatchFile(callback) {
 
-    var apiClient = new CybersourceRestApi.ApiClient();
-    var instance = new CybersourceRestApi.TransactionBatchApi(apiClient);
+    var configObject = new Configuration();
+    var instance = new CybersourceRestApi.TransactionBatchApi(configObject);
 
-    var id = "CYB00613";
-
+    var id = "Owcyk6pl";
+ 
+    console.log("\n*************** Retrieve Batch File  ********************* ");
+                
     instance.ptsV1TransactionBatchesIdGet(id, function (error, data, response) {
         if (error) {
             console.log("\nError in retrieve batch file : " + error);

@@ -1,7 +1,7 @@
 {
-  "name": "cybersource-rest-samples-nodejs",
-  "version": "1.0.0",
-  "description": "This is sample code for swagger generated payment API",
+  "name": "cybersource-rest-samples-node",
+  "version": "0.0.1",
+  "description": "Sample code for CyberSource SDK",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,10 +10,11 @@
     "Nodejs",
     "paymentsAPI"
   ],
-  "author": "ghari@visa.com",
-  "license": "ISC",
+  "author": "developer@cybersource.com",
+  "license": "MIT",
   "dependencies": {
-    "@cybersource/flex-sdk-node": "^0.1.0",
-    "CyberSource": "../cybersource-rest-client-nodejs"
+    "cybersource-rest-client": "0.0.4",
+    "eslint": "^5.9.0",
+    "jwk-to-pem": "^2.0.0"
   }
 }

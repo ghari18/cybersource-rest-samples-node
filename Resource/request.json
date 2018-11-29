@@ -9,10 +9,10 @@
     "subMerchant": {
       "cardAcceptorID": "1234567890",
       "country": "US",
-      "phoneNumber": "650-432-0000",
+      "phoneNumber": "4158880000",
       "address1": "900 Metro Center",
-      "postalCode": "94404-2775",
-      "locality": "Foster City",
+      "postalCode": "94105",
+      "locality": "San Francisco",
       "name": "Visa Inc",
       "administrativeArea": "CA",
       "region": "PEN",

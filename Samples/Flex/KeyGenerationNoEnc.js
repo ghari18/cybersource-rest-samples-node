@@ -1,34 +1,40 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
 
-function sampleCode() {
-    try {
-        var apiClient = new CybersourceRestApi.ApiClient();
-        var instance = new CybersourceRestApi.KeyGenerationApi(apiClient);
+function keyGenerationNoEnc(callback) {
 
-        var request = new CybersourceRestApi.GeneratePublicKeyRequest();
-        request.encryptionType = "None";
+    var configObject = new Configuration();
+    var instance = new CybersourceRestApi.KeyGenerationApi(configObject);
 
-        instance.generatePublicKey(request, function (error, data, response) {
-            if (error) {
-                console.log("Error : " + error);
-                console.log("Error status code : " + error.statusCode);
-            }
-            else if (data) {
-                console.log("Data : " + JSON.stringify(data));
-            }
-            console.log("Response : " + JSON.stringify(response));
-            console.log("Response id : " + response[text.id]);
+    var request = new CybersourceRestApi.GeneratePublicKeyRequest();
+    request.encryptionType = "None";
 
-        });
-    } catch (error) {
-        console.log(error);
-    }
+    var options = {
+        "generatePublicKeyRequest": request
+    };
+    console.log("\n*************** Key Generation NoEnc ********************* ");
+
+    instance.generatePublicKey(options, function (error, data, response) {
+        if (error) {
+            console.log("Error : " + error);
+            console.log("Error status code : " + error.statusCode);
+        }
+        else if (data) {
+            console.log("Data : " + JSON.stringify(data));
+        }
+        console.log("Response : " + JSON.stringify(response));
+       console.log("Response id : " + response['status']);
+       callback(error, data);
+    });
+
 };
 if (require.main === module) {
-    sampleCode(function () {
-        console.log('getMethod call complete.');
+    keyGenerationNoEnc(function () {
+        console.log('key generation end.');
     });
 }
-module.exports.sampleCode = sampleCode;
+module.exports.keyGenerationNoEnc = keyGenerationNoEnc;

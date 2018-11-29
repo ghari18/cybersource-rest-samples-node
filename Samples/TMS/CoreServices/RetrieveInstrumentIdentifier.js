@@ -3,28 +3,37 @@
  * This is a sample code to call TMS InstrumentIdentifierApi,
  * instrumentidentifiersTokenIdGet method will retrive the token details
  */
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
+var CreateInstrumentIdentifier = require('./CreateInstrumentIdentifier');
 
-function retriveAInstrumentIdentifier() {
+function retriveAInstrumentIdentifier(callback) {
     try {
-        var apiClient = new CybersourceRestApi.ApiClient();
-        var instance = new CybersourceRestApi.InstrumentIdentifierApi(apiClient);
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.InstrumentIdentifierApi(configObject);
 
         var profileId = "93B32398-AD51-4CC2-A682-EA3E93614EB1";
-        var tokenId = "7020000000000137654";
 
-        instance.instrumentidentifiersTokenIdGet(profileId, tokenId, function (error, data, response) {
-            if (error) {
-                console.log("Error : " + error);
-                console.log("Error : " + error.stack);
-                console.log("Error status code : " + error.statusCode);
-            }
-            else if (data) {
-                console.log("Data : " + JSON.stringify(data));
-            }
-            console.log("Response : " + JSON.stringify(response));
-            console.log("Response id : " + response[text.id]);
+        CreateInstrumentIdentifier.createInstrumentIdentifier(function (error, data) {
+            if (data) {
+                var tokenId = data['id'];
+                console.log("\n*************** Retrieve instrument identifier ********************* ");
+                console.log("\nToken ID passing to instrumentidentifiersTokenIdGet : " + tokenId);
 
+                instance.tmsV1InstrumentidentifiersTokenIdGet(profileId, tokenId, function (error, data, response) {
+                    if (error) {
+                        console.log("\nError in Retrieve instrument identifier : " + error);
+                    }
+                    else if (data) {
+                        console.log("\nData of Retrieve instrument identifier : " + JSON.stringify(data));
+                    }
+                    console.log("\nResponse of  Retrieve instrument identifier : " + JSON.stringify(response));
+                    console.log("\nResponse Code of Retrieve instrument identifier :" + JSON.stringify(response['status']));
+                    callback(error, data);
+                });
+            }
         });
     } catch (error) {
         console.log(error);
@@ -32,7 +41,7 @@ function retriveAInstrumentIdentifier() {
 };
 if (require.main === module) {
     retriveAInstrumentIdentifier(function () {
-        console.log('Method call complete.');
+        console.log('Retrieve InstrumentIdentifer end.');
     });
 }
 module.exports.retriveAInstrumentIdentifier = retriveAInstrumentIdentifier;

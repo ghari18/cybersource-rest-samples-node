@@ -1,32 +1,42 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
 
 /**
  * This is a sample code to call ReportSubscriptionsApi,
  * retrive report subscription .. visa wiki sample
  */
-function sampleCode() {
+function getReportResourceInformation(callback) {
+    try {
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.ReportDefinitionsApi(configObject);
+        var opts = [];
+        opts['organizationId'] = "testrest";
 
-    var apiClient = new CybersourceRestApi.ApiClient();
-    var instance = new CybersourceRestApi.ReportSubscriptionsApi(apiClient);
+        console.log("****************Get Reports Resource Information****************")
 
-    instance.getAllSubscriptions(function (error, data, response) {
-        if (error) {
-            console.log("Error : " + error)
-        }
-        else if (data) {
-            console.log("Data : " + JSON.stringify(data));
-        }
-
-        console.log("Response : " + JSON.stringify(response));
-
-    });
+        instance.getResourceV2Info(opts, function (error, data, response) {
+            if (error) {
+                console.log("\nError in get reports resource Information : " + error);
+            }
+            else if (data) {
+                console.log("\nData of get reports resource Information : " + JSON.stringify(data));
+            }
+            console.log("\nResponse of get reports resource Information : " + JSON.stringify(response));
+            console.log("\nResponse Code of get reports resource Information : " + JSON.stringify(response['status']));
+            callback(error, data);
+        });
+    } catch (error) {
+        console.log(error);
+    }
 
 };
 if (require.main === module) {
-    sampleCode(function () {
-        console.log('getMethod call complete.');
+    getReportResourceInformation(function () {
+        console.log('get report resource information end.');
     });
 }
 module.exports.sampleCode = sampleCode;
