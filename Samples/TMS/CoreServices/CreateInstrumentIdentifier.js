@@ -1,63 +1,64 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
 
 /**
  * This is a sample code to call TMS InstrumentIdentifierApi,
  * instrumentidentifiersPost method will create a new InstrumentIdentifier
  */
 
-function createInstrumentIdentifier() {
+function createInstrumentIdentifier(callback) {
     try {
-        var apiClient = new CybersourceRestApi.ApiClient();
-        var instance = new CybersourceRestApi.InstrumentIdentifierApi(apiClient);
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.InstrumentIdentifiersApi(configObject);
 
-        var card = new CybersourceRestApi.PaymentinstrumentsCard();
-        card.number = "1234567890987654";
+        var card = new CybersourceRestApi.Tmsv1paymentinstrumentsCard();
+        card.number = "1234567890117654";
 
 
-        var merchantInitiatedTransaction = new CybersourceRestApi.InstrumentidentifiersProcessingInformationAuthorizationOptionsInitiatorMerchantInitiatedTransaction();
+        var merchantInitiatedTransaction = new CybersourceRestApi.Tmsv1instrumentidentifiersProcessingInformationAuthorizationOptionsInitiatorMerchantInitiatedTransaction();
         var previousTransactionId = "123456789012345";
         merchantInitiatedTransaction.previousTransactionId = previousTransactionId;
 
-        var initiator = new CybersourceRestApi.InstrumentidentifiersProcessingInformationAuthorizationOptionsInitiator();
+        var initiator = new CybersourceRestApi.Tmsv1instrumentidentifiersProcessingInformationAuthorizationOptionsInitiator();
         initiator.merchantInitiatedTransaction = merchantInitiatedTransaction;
 
-        var authorizationOptions = new CybersourceRestApi.InstrumentidentifiersProcessingInformationAuthorizationOptions();
+        var authorizationOptions = new CybersourceRestApi.Tmsv1instrumentidentifiersProcessingInformationAuthorizationOptions();
         authorizationOptions.initiator = initiator;
 
-        var processingInformation = new CybersourceRestApi.PaymentinstrumentsProcessingInformation();
+        var processingInformation = new CybersourceRestApi.Tmsv1paymentinstrumentsProcessingInformation();
         processingInformation.authorizationOptions = authorizationOptions;
 
         var body = new CybersourceRestApi.Body();
         body.card = card;
         body.processingInformation = processingInformation;
 
-        var options = {
-            "body": body
-        };
-
         var profileId = "93B32398-AD51-4CC2-A682-EA3E93614EB1";
-
-        instance.instrumentidentifiersPost(profileId, options, function (error, data, response) {
+        
+        console.log("\n*************** Create Instrument Identifier ********************* ");
+        instance.tmsV1InstrumentidentifiersPost(profileId, body, function (error, data, response) {
             if (error) {
-                console.log("Error : " + error);
-                console.log("Error : " + error.stack);
-                console.log("Error status code : " + error.statusCode);
+                console.log("\nError in create instrument identifier : " + error);
             }
             else if (data) {
-                console.log("Data : " + JSON.stringify(data));
+                console.log("\nData of Create instrument identifier : " + JSON.stringify(data));
             }
-            console.log("Response : " + JSON.stringify(response));
-            console.log("Response id : " + response[text.id]);
-
+            console.log("\nResponse of  Create instrument identifier : " + JSON.stringify(response));
+            console.log("\nResponse Code of Create instrument identifier :" + JSON.stringify(response['status']));
+            callback(error,data);
         });
+        
     } catch (error) {
         console.log(error);
     }
 };
 
 if (require.main === module) {
-    createInstrumentIdentifier();
+    createInstrumentIdentifier(function () {
+        console.log('Create instrument identifier end.');
+    });
 }
 module.exports.createInstrumentIdentifier = createInstrumentIdentifier;

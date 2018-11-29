@@ -1,38 +1,49 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
+var CapturePayment = require('./CapturePayment');
 /**
  * This is a sample code to call RefundApi,
  * Include the capture ID in the POST request to refund the captured amount. 
  */
-function refundACapture() {
+function refundACapture(callback) {
     try {
         var request = new CybersourceRestApi.RefundCaptureRequest();
-        var apiClient = new CybersourceRestApi.ApiClient();
-        var instance = new CybersourceRestApi.RefundApi(apiClient);
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.RefundApi(configObject);
 
-        var clientReferenceInformation = new CybersourceRestApi.V2paymentsClientReferenceInformation();
-        clientReferenceInformation.code = "Testing-VDP-Capture-Refund";
+        var clientReferenceInformation = new CybersourceRestApi.Ptsv2paymentsClientReferenceInformation();
+        clientReferenceInformation.code = "test_refund_capture";
         request.clientReferenceInformation = clientReferenceInformation;
-        var orderInformation = new CybersourceRestApi.V2paymentsidrefundsOrderInformation();
-        var amountDetails = new CybersourceRestApi.V2paymentsOrderInformationAmountDetails();
+        var orderInformation = new CybersourceRestApi.Ptsv2paymentsidrefundsOrderInformation();
+        var amountDetails = new CybersourceRestApi.Ptsv2paymentsOrderInformationAmountDetails();
         amountDetails.totalAmount = "102.21";
         amountDetails.currency = "USD";
         orderInformation.amountDetails = amountDetails;
         request.orderInformation = orderInformation;
 
-        var id = "5336232827876732903529";
-        instance.refundCapture(request, id, function (error, data, response) {
-            if (error) {
-                console.log("Error : " + error);
-                console.log("Error : " + error.stack);
-                console.log("Error status code : " + error.statusCode);
-            }
-            else if (data) {
-                console.log("Data : " + JSON.stringify(data));
-            }
-            console.log("Response : " + JSON.stringify(response));
+        CapturePayment.processCaptureAPayment(function (error, data) {
+            if (data) {
+                var id = data['id'];
+                console.log("\n*************** Refund Capture ********************* ");
+                console.log("\nCapture ID passing to refundCapture : " + id);
 
+                instance.refundCapture(request, id, function (error, data, response) {
+                    if (error) {
+                        console.log("\nError in Refund Capture : " + error);
+                    }
+                    else if (data) {
+                        console.log("\nData in Refund Capture: " + JSON.stringify(data));
+                    }
+                    console.log("\nResponse of Refund Capture: " + JSON.stringify(response));
+                    console.log("\nResponse Code of Refund Capture  : " + JSON.stringify(response['status']));
+                    callback(error, data);
+
+                });
+            }
         });
     } catch (error) {
         console.log(error);
@@ -40,7 +51,7 @@ function refundACapture() {
 };
 if (require.main === module) {
     refundACapture(function () {
-        console.log('Method call complete.');
+        console.log('Refund Capture end.');
     });
 }
 module.exports.refundACapture = refundACapture;

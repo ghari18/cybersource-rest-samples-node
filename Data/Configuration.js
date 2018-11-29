@@ -1,16 +1,16 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var CybersourceRestApi = require('cybersource-rest-client');
 /*
 * If Cybs.json file is not provided Merchant configuration properties are taken from Configuration module
 */
 
 //set the constant values 
 const MerchantId = "testrest";
-const MerchantSecretKey = "yBJxy6LjM2TmcPGu+GaJrHtkke25fPpUX+UY6/L/1tE=";
 const MerchantKeyId = "08c94330-f618-42a3-b09d-e1e43be5efda";
-const AuthenticationType = "http_signature";
-const KeysDirectory = "SampleCodeCybsNode\\Resource";
+const MerchantSecretKey = "yBJxy6LjM2TmcPGu+GaJrHtkke25fPpUX+UY6/L/1tE=";
+const AuthenticationType = "jwt";
+const KeysDirectory = "Resource";
 const KeyFileName = "testrest";
 const RunEnvironment = "cybersource.environment.sandbox";
 const KeyAlias = "testrest";

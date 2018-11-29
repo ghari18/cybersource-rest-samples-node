@@ -1,46 +1,59 @@
 'use strict'
 
-var CybersourceRestApi = require('CyberSource');
+var path = require('path');
+var filePath = path.resolve('Data/Configuration.js');
+var Configuration = require(filePath);
+var CybersourceRestApi = require('cybersource-rest-client');
+var ProcessPayment = require('./ProcessPayment');
 
 /**
  * This is a sample code to call VoidApi,
  * Void a Payment
  * Include the payment ID in the POST request to cancel the payment.
  */
-function voidAPayment() {
+function voidPayment(callback) {
 
     try {
 
-        var apiClient = new CybersourceRestApi.ApiClient();
-        var instance = new CybersourceRestApi.VoidApi(apiClient);
+        var configObject = new Configuration();
+        var instance = new CybersourceRestApi.VoidApi(configObject);
 
-        var clientReferenceInformation = new CybersourceRestApi.V2paymentsClientReferenceInformation();
-        clientReferenceInformation.code = "test_void";
+        var clientReferenceInformation = new CybersourceRestApi.Ptsv2paymentsClientReferenceInformation();
+        clientReferenceInformation.code = "test_payment_void";
 
         var request = new CybersourceRestApi.VoidPaymentRequest();
         request.clientReferenceInformation = clientReferenceInformation;
 
-        var id = "5390806082126095503004";
+        var enableCapture = true;
 
-        instance.voidPayment(request, id, function (error, data, response) {
-            if (error) {
-                console.log("Error : " + error);
-                console.log("Error : " + error.stack);
-                console.log("Error status code : " + error.statusCode);
-            }
-            else if (data) {
-                console.log("Data : " + JSON.stringify(data));
-            }
-            console.log("Response : " + JSON.stringify(response));
+        ProcessPayment.processPayment(function (error, data) {
+            if (data) {
+                var id = data['id'];
+                console.log("\n*************** Void Payment ********************* ");
+                console.log("Payment ID passing to voidPayment : " + id);
 
-        });
+                instance.voidPayment(request, id, function (error, data, response) {
+                    if (error) {
+                        console.log("\nError in void payment: " + error);
+                    }
+                    else if (data) {
+                        console.log("\nData of void Payment : " + JSON.stringify(data));
+                    }
+                    console.log("\nResponse of  void Payment  : " + JSON.stringify(response));
+                    console.log("\nResponse Code of void Payment : " + JSON.stringify(response['status']));
+                    callback(error, data);
+                });
+
+            }
+        }, enableCapture);
+
     } catch (error) {
         console.log(error);
     }
 };
 if (require.main === module) {
-    voidAPayment(function () {
-        console.log('Method call complete.');
+    voidPayment(function () {
+        console.log('Void Payment end.');
     });
 }
-module.exports.voidAPayment = voidAPayment;
+module.exports.voidPayment = voidPayment;
